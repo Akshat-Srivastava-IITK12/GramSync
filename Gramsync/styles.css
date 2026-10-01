@@ -1,0 +1,123 @@
+/* GRAMSYNC Design System & Map Enhancements */
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Range input custom styling */
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: #047857;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s ease-in-out;
+}
+
+input[type=range]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Specific Rotten Range Thumb */
+#simRotten::-webkit-slider-thumb {
+  background: #4d7c0f !important;
+}
+
+/* Pathway Cards */
+.pathway-card {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.pathway-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.08);
+}
+
+.pathway-card.selected-pathway {
+  border: 2px solid #059669 !important;
+  background: #f0fdf4 !important;
+  box-shadow: 0 8px 24px -4px rgba(5, 150, 105, 0.2) !important;
+}
+
+.pathway-card.compost-pathway {
+  border: 2px solid #65a30d !important;
+  background: #f7fee7 !important;
+}
+
+/* Leaflet Map Custom Marker Styling */
+.custom-map-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  border: 2px solid white;
+}
+
+.marker-farm {
+  background: linear-gradient(135deg, #059669, #064e3b);
+}
+
+.marker-fpo {
+  background: linear-gradient(135deg, #4f46e5, #312e81);
+}
+
+.marker-mandi {
+  background: linear-gradient(135deg, #e11d48, #9f1239);
+}
+
+.marker-storage {
+  background: linear-gradient(135deg, #0284c7, #075985);
+}
+
+.marker-compost {
+  background: linear-gradient(135deg, #65a30d, #365314);
+}
+
+/* Pulse animation for active destination */
+@keyframes mapPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgba(5, 150, 105, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(5, 150, 105, 0);
+  }
+}
+
+.marker-active-pulse {
+  animation: mapPulse 1.8s infinite;
+}
+
+/* Leaflet Popup Polish */
+.leaflet-popup-content-wrapper {
+  border-radius: 16px !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2) !important;
+  font-family: "Plus Jakarta Sans", sans-serif !important;
+  padding: 4px !important;
+}
+
+.leaflet-popup-content {
+  margin: 10px 14px !important;
+  line-height: 1.4 !important;
+}

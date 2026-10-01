@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GRAMSYNC | Harvest Routing & Orchestration Engine</title>
+  <meta name="description" content="AI-powered rural production orchestration platform connecting farm-level supply with optimized selling locations, logistics routes, and composting recovery." />
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              200: '#a7f3d0',
+              300: '#6ee7b7',
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+              950: '#022c22',
+            },
+            harvest: {
+              gold: '#f59e0b',
+              amber: '#d97706',
+              soil: '#78350f',
+              compost: '#4d7c0f',
+              sand: '#fef3c7'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            display: ['"Outfit"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Leaflet CSS & JS for Interactive Map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="bg-[#fafaf7] text-slate-800 font-sans antialiased selection:bg-brand-500 selection:text-white">
+
+  <!-- TOP BANNER -->
+  <div class="bg-gradient-to-r from-brand-900 via-brand-800 to-brand-950 text-white text-xs sm:text-sm py-2 px-4 shadow-sm border-b border-brand-700/50">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
+      <div class="flex items-center gap-2 justify-center">
+        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30" data-i18n="bannerTag">
+          Live Operational System
+        </span>
+        <span class="text-emerald-100 font-medium tracking-wide">
+          <span data-i18n="bannerText">"Where, when and how should this harvest move?"</span> — 
+          <span class="text-amber-300 font-semibold" data-i18n="bannerSub">AI Route & Location Optimization</span>
+        </span>
+      </div>
+      <div class="flex items-center gap-3 text-xs text-emerald-200">
+        <span class="hidden md:inline-flex items-center gap-1">
+          <i data-lucide="map-pin" class="w-3.5 h-3.5 text-emerald-400"></i> <span data-i18n="geoHubBadge">Nashik Agri Belt • Active Node</span>
+        </span>
+        <a href="#simulator" class="underline hover:text-white transition-colors" data-i18n="bannerCta">Route Your Harvest Now →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN NAVIGATION -->
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <a href="#" class="flex items-center gap-3 group">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-brand-600 to-brand-900 flex items-center justify-center text-white shadow-md shadow-brand-600/20 group-hover:scale-105 transition-transform duration-200">
+          <i data-lucide="sprout" class="w-6 h-6 text-emerald-300"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-2xl font-extrabold tracking-tight font-display text-slate-900">GRAM<span class="text-brand-600">SYNC</span></span>
+            <span class="px-1.5 py-0.5 text-[10px] uppercase font-bold tracking-wider rounded bg-brand-100 text-brand-800" data-i18n="logoBadge">Routing Engine</span>
+          </div>
+          <p class="text-[11px] font-medium text-slate-500 tracking-tight" data-i18n="logoSub">Rural Production Orchestration</p>
+        </div>
+      </a>
+
+      <!-- Navigation Links -->
+      <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
+        <a href="#simulator" class="hover:text-brand-600 transition-colors flex items-center gap-1.5">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
+          </span>
+          <span data-i18n="navSimulator">Live Harvest Dispatcher</span>
+        </a>
+        <a href="#map-section" class="hover:text-brand-600 transition-colors flex items-center gap-1.5">
+          <i data-lucide="map" class="w-4 h-4 text-emerald-600"></i>
+          <span data-i18n="navMap">Optimized Route Map</span>
+        </a>
+        <a href="#compost-section" class="hover:text-brand-600 transition-colors flex items-center gap-1.5">
+          <i data-lucide="recycle" class="w-4 h-4 text-lime-600"></i>
+          <span data-i18n="navCompost">Composting & Waste Recovery</span>
+        </a>
+        <a href="#partner-form" class="hover:text-brand-600 transition-colors" data-i18n="navSignUp">Sign Up / Join</a>
+      </nav>
+
+      <!-- Language Toggle & CTA Button -->
+      <div class="flex items-center gap-3">
+        
+        <!-- Language Switcher: English <-> Hindi -->
+        <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+          <button id="langBtnEn" onclick="switchLanguage('en')" class="px-2.5 py-1 text-xs font-bold rounded-lg transition-all bg-white text-brand-800 shadow-sm">
+            English
+          </button>
+          <button id="langBtnHi" onclick="switchLanguage('hi')" class="px-2.5 py-1 text-xs font-bold rounded-lg transition-all text-slate-600 hover:text-slate-900">
+            हिन्दी
+          </button>
+        </div>
+
+        <a href="#partner-form" class="inline-flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 text-white shadow-sm shadow-brand-700/20 hover:shadow-md transition">
+          <span data-i18n="ctaSignUp">Register Farm / FPO</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </a>
+
+        <!-- Mobile Drawer Toggle -->
+        <button id="mobileMenuBtn" class="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100">
+          <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div id="mobileMenu" class="hidden md:hidden border-b border-slate-200 bg-white px-6 py-4 space-y-3">
+      <a href="#simulator" class="block py-2 text-sm font-semibold text-brand-600" data-i18n="navSimulator">Live Harvest Dispatcher</a>
+      <a href="#map-section" class="block py-2 text-sm font-semibold text-slate-700" data-i18n="navMap">Optimized Route Map</a>
+      <a href="#compost-section" class="block py-2 text-sm font-semibold text-slate-700" data-i18n="navCompost">Composting & Waste Recovery</a>
+      <a href="#partner-form" class="block py-2 text-sm font-semibold text-slate-700" data-i18n="navSignUp">Sign Up / Join Network</a>
+    </div>
+  </header>
+
+  <!-- HERO SECTION: PROBLEM SOLVING ACTION CONSOLE -->
+  <section class="relative overflow-hidden pt-10 pb-12 bg-gradient-to-b from-[#f2f8f4] via-[#fafaf7] to-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto space-y-4">
+        
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100 border border-emerald-200 text-brand-900 text-xs font-bold">
+          <span class="flex h-2 w-2 rounded-full bg-brand-600 animate-pulse"></span>
+          <span data-i18n="heroBadge">Solving Farmgate Realization & Spoilage in Real Time</span>
+        </div>
+
+        <h1 class="text-3xl sm:text-5xl font-extrabold font-display text-slate-900 tracking-tight leading-tight">
+          <span data-i18n="heroTitlePart1">Smart Harvest Dispatch: Find The </span>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-700 via-brand-600 to-emerald-500" data-i18n="heroTitlePart2">Optimized Selling Location</span>
+        </h1>
+
+        <p class="text-base sm:text-lg text-slate-600 font-normal leading-relaxed" data-i18n="heroSubtitle">
+          Don't lose money on high headline quotes eroded by freight, delays, and transit damage. Enter your harvest details below to calculate net payout, view live geospatial routes, and divert rotten crops for bio-composting recovery.
+        </p>
+
+        <!-- Fast Stats Strip -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 text-left max-w-3xl mx-auto">
+          <div class="p-3 bg-white rounded-2xl border border-slate-200 shadow-sm">
+            <div class="text-xs text-slate-500 font-medium" data-i18n="stat1Label">Market Matching</div>
+            <div class="text-base font-bold text-slate-900 font-display" data-i18n="stat1Val">Mandi vs Processor</div>
+          </div>
+          <div class="p-3 bg-white rounded-2xl border border-slate-200 shadow-sm">
+            <div class="text-xs text-slate-500 font-medium" data-i18n="stat2Label">Logistics Consolidation</div>
+            <div class="text-base font-bold text-brand-700 font-display" data-i18n="stat2Val">Shared FPO Freight</div>
+          </div>
+          <div class="p-3 bg-white rounded-2xl border border-slate-200 shadow-sm">
+            <div class="text-xs text-slate-500 font-medium" data-i18n="stat3Label">Holding Option</div>
+            <div class="text-base font-bold text-indigo-700 font-display" data-i18n="stat3Val">Cold/Dry Storage</div>
+          </div>
+          <div class="p-3 bg-white rounded-2xl border border-slate-200 shadow-sm">
+            <div class="text-xs text-slate-500 font-medium" data-i18n="stat4Label">Zero Waste Loop</div>
+            <div class="text-base font-bold text-lime-700 font-display" data-i18n="stat4Val">Bio-Compost Recovery</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- LIVE SIMULATOR: HARVEST DISPATCH ENGINE -->
+  <section id="simulator" class="py-12 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      
+      <!-- Section Header -->
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-slate-200">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-brand-700 bg-brand-50 px-3 py-1 rounded-full border border-brand-200" data-i18n="simTag">
+            Step 1: Input Harvest Details
+          </span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold font-display text-slate-900 mt-2 tracking-tight" data-i18n="simTitle">
+            Harvest Dispatch & Net Realization Optimizer
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-600 mt-1" data-i18n="simDesc">
+            Configure your harvest volume, urgency, and rotten crop portion to generate real-time dispatch routes.
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="playVoiceBrief()" class="px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-brand-800 text-xs font-bold border border-emerald-200 flex items-center gap-2 transition">
+            <i data-lucide="volume-2" class="w-4 h-4 text-emerald-600"></i>
+            <span data-i18n="voiceBtn">Hear Voice Guidance (हिन्दी)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Simulator Inputs Card -->
+      <div class="bg-slate-50 p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
+          
+          <!-- 1. Select Crop -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2" data-i18n="labelCrop">
+              1. Crop Type
+            </label>
+            <select id="simCrop" class="w-full bg-white border border-slate-300 text-slate-900 font-bold rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none" onchange="runSimulation()">
+              <option value="tomato">🍅 Tomato (टमाटर - Perishable)</option>
+              <option value="onion">🧅 Onion (प्याज - Storable)</option>
+              <option value="chilli">🌶️ Green Chilli (हरी मिर्च - Processing)</option>
+              <option value="potato">🥔 Potato (आलू - Cold Storage)</option>
+              <option value="mango">🥭 Mango (आम - High Value)</option>
+            </select>
+            <span class="text-[11px] text-slate-500 mt-1 block" data-i18n="cropHelp">Affects perishability decay & processing feasibility.</span>
+          </div>
+
+          <!-- 2. Harvest Volume -->
+          <div>
+            <div class="flex justify-between items-baseline mb-2">
+              <label class="text-xs font-bold text-slate-700 uppercase tracking-wider" data-i18n="labelVolume">
+                2. Harvest Quantity
+              </label>
+              <span id="simQtyVal" class="text-sm font-bold font-mono text-brand-700">25 Q (2,500 kg)</span>
+            </div>
+            <input type="range" id="simQty" min="5" max="150" value="25" step="5" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-600" oninput="updateQtyDisplay(); runSimulation()">
+            <div class="flex justify-between text-[10px] text-slate-400 mt-1 font-mono">
+              <span>5 Q</span>
+              <span>75 Q</span>
+              <span>150 Q</span>
+            </div>
+          </div>
+
+          <!-- 3. Liquidity Urgency -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2" data-i18n="labelUrgency">
+              3. Payment Urgency
+            </label>
+            <select id="simUrgency" class="w-full bg-white border border-slate-300 text-slate-900 font-bold rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none" onchange="runSimulation()">
+              <option value="immediate" data-i18n="urgencyImmediate">Immediate Cash (Within 24 Hours)</option>
+              <option value="flexible" selected data-i18n="urgencyFlexible">Flexible (Can wait 2-5 days for best net)</option>
+              <option value="storage" data-i18n="urgencyStorage">Storage Arbitrage (Wait for off-peak price)</option>
+            </select>
+            <span class="text-[11px] text-slate-500 mt-1 block" data-i18n="urgencyHelp">Allows holding or batch aggregation.</span>
+          </div>
+
+          <!-- 4. ROTTEN / SPOILED CROP OPTION (NEW REQUIREMENT) -->
+          <div class="bg-lime-50/70 p-3.5 rounded-2xl border border-lime-200">
+            <div class="flex justify-between items-baseline mb-1">
+              <label class="text-xs font-bold text-lime-900 uppercase tracking-wider flex items-center gap-1.5">
+                <i data-lucide="recycle" class="w-4 h-4 text-lime-700"></i>
+                <span data-i18n="labelRotten">Rotten / Damaged Crop</span>
+              </label>
+              <span id="simRottenVal" class="text-xs font-extrabold font-mono text-lime-900">15% (375 kg)</span>
+            </div>
+            <input type="range" id="simRotten" min="0" max="100" value="15" step="5" class="w-full h-2 bg-lime-200 rounded-lg appearance-none cursor-pointer accent-lime-700" oninput="updateRottenDisplay(); runSimulation()">
+            <div class="flex justify-between text-[10px] text-lime-700 mt-1 font-mono">
+              <span data-i18n="rottenMin">0% (All Fresh)</span>
+              <span data-i18n="rottenMax">100% (All Rotten)</span>
+            </div>
+            <span class="text-[10px] text-lime-800 mt-1.5 block font-medium" data-i18n="rottenNotice">
+              ♻️ Automatically diverted to rural composting plant at ₹2.50/kg!
+            </span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Generated Evaluated Pathways -->
+      <div class="space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <i data-lucide="route" class="w-5 h-5 text-brand-600"></i>
+            <span data-i18n="pathwaysHeader">Evaluated Selling & Disposal Destinations</span>
+          </h3>
+          <span class="text-xs font-medium text-slate-500" data-i18n="clickCardNotice">
+            👉 Click any destination card below to highlight its exact route on the map!
+          </span>
+        </div>
+
+        <!-- 4 Dynamic Pathways Grid -->
+        <div id="pathwaysContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          <!-- Dynamically populated by app.js -->
+        </div>
+
+        <!-- Dynamic Recommendation Banner -->
+        <div id="simDetailBox" class="p-5 rounded-2xl bg-brand-50 border border-brand-200">
+          <!-- Dynamically populated by app.js -->
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- STEP 2: THE MAP FOLLOW-UP (OPTIMIZED SELLING LOCATION & ROUTE) -->
+  <section id="map-section" class="py-12 bg-slate-50 border-t border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      
+      <!-- Section Header -->
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full border border-emerald-300" data-i18n="mapTag">
+            Step 2: Real-Time Geospatial Follow-Up
+          </span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold font-display text-slate-900 mt-2 tracking-tight" data-i18n="mapTitle">
+            Live Route & Optimized Selling Location Map
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-600 mt-1" data-i18n="mapDesc">
+            Geographic view of farm origin, mandi, processing unit, cold storage, and bio-composting facility. Routes update dynamically as you select destinations.
+          </p>
+        </div>
+
+        <!-- Legend Pills -->
+        <div class="flex flex-wrap items-center gap-2 text-xs">
+          <span class="px-2.5 py-1 rounded-lg bg-emerald-100 text-brand-900 font-bold border border-emerald-300 flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span> <span data-i18n="legendFarm">Farm Cluster (Origin)</span>
+          </span>
+          <span class="px-2.5 py-1 rounded-lg bg-indigo-100 text-indigo-900 font-bold border border-indigo-200 flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span> <span data-i18n="legendFpo">FPO Processing</span>
+          </span>
+          <span class="px-2.5 py-1 rounded-lg bg-rose-100 text-rose-900 font-bold border border-rose-200 flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-600"></span> <span data-i18n="legendMandi">APMC Mandi</span>
+          </span>
+          <span class="px-2.5 py-1 rounded-lg bg-lime-100 text-lime-900 font-bold border border-lime-300 flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-lime-600"></span> <span data-i18n="legendCompost">Composting Plant (Rotten)</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Map & Active Route Intelligence Container -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        
+        <!-- The Interactive Leaflet Map (Col 8) -->
+        <div class="lg:col-span-8 bg-white rounded-3xl p-3 sm:p-4 border border-slate-200 shadow-md">
+          <div id="harvestMap" class="w-full h-[480px] rounded-2xl z-10"></div>
+          <div class="mt-3 px-2 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 gap-2">
+            <div class="flex items-center gap-1.5">
+              <i data-lucide="info" class="w-3.5 h-3.5 text-brand-600"></i>
+              <span data-i18n="mapTip">Interactive map: Zoom, pan, or click markers to inspect facility details and capacity.</span>
+            </div>
+            <div class="font-mono text-slate-600">
+              <span data-i18n="mapCoords">Region: Dindori - Nashik - Pimpalgaon Agri Cluster</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Selected Route Details Panel (Col 4) -->
+        <div class="lg:col-span-4 bg-white rounded-3xl p-6 border border-slate-200 shadow-md flex flex-col justify-between space-y-6">
+          
+          <div>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+              <span class="text-xs font-bold uppercase tracking-wider text-brand-800" data-i18n="panelRouteTitle">Active Selected Route</span>
+              <span id="activeRouteBadge" class="px-2 py-0.5 rounded text-[11px] font-bold bg-brand-100 text-brand-800">
+                Recommended
+              </span>
+            </div>
+
+            <div class="mt-4 space-y-4">
+              <div>
+                <h4 id="activeDestName" class="text-lg font-bold text-slate-900 font-display">
+                  Sahyadri Agro-Processing Facility
+                </h4>
+                <p id="activeDestType" class="text-xs text-brand-700 font-medium">
+                  Direct Institutional Contract / FPO Aggregated
+                </p>
+              </div>
+
+              <!-- Route Distance & Transit Specs -->
+              <div class="grid grid-cols-2 gap-3">
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                  <div class="text-[10px] uppercase font-bold text-slate-400" data-i18n="specDistance">Distance</div>
+                  <div id="activeDistance" class="text-lg font-black font-mono text-slate-800">18 km</div>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                  <div class="text-[10px] uppercase font-bold text-slate-400" data-i18n="specTransitTime">Est. Travel Time</div>
+                  <div id="activeDuration" class="text-lg font-black font-mono text-slate-800">35 mins</div>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                  <div class="text-[10px] uppercase font-bold text-slate-400" data-i18n="specFreight">Consolidated Freight</div>
+                  <div id="activeFreight" class="text-lg font-black font-mono text-emerald-700">₹850</div>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                  <div class="text-[10px] uppercase font-bold text-slate-400" data-i18n="specNetPayout">Net Farmer Payout</div>
+                  <div id="activeNetPayout" class="text-lg font-black font-mono text-brand-700">₹42,150</div>
+                </div>
+              </div>
+
+              <!-- Rotten Crop Split Card -->
+              <div id="rottenSplitCard" class="p-3.5 rounded-xl bg-lime-50 border border-lime-200 space-y-1">
+                <div class="flex items-center justify-between text-xs font-bold text-lime-900">
+                  <span class="flex items-center gap-1">
+                    <i data-lucide="recycle" class="w-3.5 h-3.5 text-lime-700"></i>
+                    <span data-i18n="rottenSplitTitle">Compost Diversion Active</span>
+                  </span>
+                  <span id="rottenPayoutVal" class="font-mono text-lime-800">+₹938 Payout</span>
+                </div>
+                <p id="rottenSplitDesc" class="text-[11px] text-lime-800 leading-tight">
+                  375 kg spoiled tomatoes routed to <strong>Gramsync Green Bio-Compost Hub</strong> (5 km) for organic fertilizer production.
+                </p>
+              </div>
+
+              <!-- Route Driver / Vehicle Coordination -->
+              <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                <div class="text-xs font-bold text-slate-800 flex items-center justify-between">
+                  <span data-i18n="coordStatus">Coordinated Fleet Match</span>
+                  <span class="text-emerald-700 font-semibold flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Available
+                  </span>
+                </div>
+                <div class="text-xs text-slate-600 flex justify-between">
+                  <span data-i18n="truckType">Vehicle: Shared Bolero Maxi (FPO Batch #402)</span>
+                  <span class="font-bold text-slate-800">Capacity 2.5 MT</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Action CTA -->
+          <div class="pt-2">
+            <button onclick="confirmRouteDispatch()" class="w-full py-3.5 rounded-xl bg-brand-700 hover:bg-brand-800 text-white font-bold text-sm shadow-md shadow-brand-700/20 transition flex items-center justify-center gap-2">
+              <i data-lucide="check-circle" class="w-4 h-4"></i>
+              <span data-i18n="btnConfirmDispatch">Confirm & Lock This Dispatch Route</span>
+            </button>
+            <p class="text-[10px] text-center text-slate-400 mt-2" data-i18n="dispatchNotice">
+              Transmits pick-up details to FPO coordinator and destination receiver.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- COMPOSTING & ZERO WASTE RECOVERY SPOTLIGHT -->
+  <section id="compost-section" class="py-14 bg-white border-t border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="bg-gradient-to-br from-lime-900 via-harvest-soil to-slate-950 rounded-3xl p-8 sm:p-12 text-white shadow-xl">
+        <div class="grid lg:grid-cols-12 gap-8 items-center">
+          
+          <div class="lg:col-span-8 space-y-4">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-lime-400/20 border border-lime-400/30 text-lime-300 text-xs font-bold">
+              <i data-lucide="recycle" class="w-4 h-4"></i>
+              <span data-i18n="compostBadge">Circular Agriculture & Zero Waste</span>
+            </div>
+
+            <h3 class="text-2xl sm:text-4xl font-extrabold font-display tracking-tight text-white" data-i18n="compostTitle">
+              Transforming Rotten Harvests Into Cash & Organic Bio-Fertilizer
+            </h3>
+
+            <p class="text-sm sm:text-base text-lime-100/90 leading-relaxed" data-i18n="compostDesc">
+              When crops spoil due to weather, delay, or transit stress, traditional channels force farmers to dump them on highways for zero return. GRAMSYNC automatically detects spoiled or damaged portions and routes them directly to local vermicompost units, bio-CNG plants, and organic fertilizer producers.
+            </p>
+
+            <div class="grid sm:grid-cols-3 gap-4 pt-2">
+              <div class="p-3.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15">
+                <div class="text-xl font-bold font-mono text-lime-300">₹2.00 - ₹3.50</div>
+                <div class="text-xs text-lime-100 font-medium mt-0.5" data-i18n="compostPerKg">Payout per kg for organic compost biomass</div>
+              </div>
+              <div class="p-3.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15">
+                <div class="text-xl font-bold font-mono text-amber-300">100%</div>
+                <div class="text-xs text-lime-100 font-medium mt-0.5" data-i18n="compostDiversion">Diversion from landfills & road dumping</div>
+              </div>
+              <div class="p-3.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15">
+                <div class="text-xl font-bold font-mono text-emerald-300">&lt; 8 km</div>
+                <div class="text-xs text-lime-100 font-medium mt-0.5" data-i18n="compostRadius">Hyper-local village composting radius</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-4 bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 space-y-4 text-xs">
+            <h4 class="font-bold text-sm text-lime-300 uppercase tracking-wider" data-i18n="compostProcessTitle">The 3-Step Waste Recovery Loop</h4>
+            <div class="space-y-3">
+              <div class="flex items-start gap-3">
+                <div class="w-6 h-6 rounded-full bg-lime-400 text-lime-950 font-bold flex items-center justify-center shrink-0">1</div>
+                <div>
+                  <strong class="text-white" data-i18n="step1Title">Damage Assessment:</strong>
+                  <p class="text-lime-200 mt-0.5" data-i18n="step1Desc">Farmer or FPO grades spoiled volume on the simulator.</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <div class="w-6 h-6 rounded-full bg-lime-400 text-lime-950 font-bold flex items-center justify-center shrink-0">2</div>
+                <div>
+                  <strong class="text-white" data-i18n="step2Title">Automated Dispatch:</strong>
+                  <p class="text-lime-200 mt-0.5" data-i18n="step2Desc">Routed to the closest verified composting or biogas digester.</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <div class="w-6 h-6 rounded-full bg-lime-400 text-lime-950 font-bold flex items-center justify-center shrink-0">3</div>
+                <div>
+                  <strong class="text-white" data-i18n="step3Title">Farmer Recovery Credit:</strong>
+                  <p class="text-lime-200 mt-0.5" data-i18n="step3Desc">Direct payment credited to the farmer's account for biomass input.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SIGN-UP & ONBOARDING -->
+  <section id="partner-form" class="py-16 bg-[#fafaf7] border-t border-slate-200">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center space-y-3">
+        <span class="text-xs font-bold tracking-wider uppercase text-brand-700 bg-brand-50 px-3.5 py-1.5 rounded-full border border-brand-200" data-i18n="signUpTag">
+          Join The Network
+        </span>
+        <h2 class="text-3xl font-extrabold font-display text-slate-900 tracking-tight" data-i18n="signUpTitle">
+          Sign Up For GRAMSYNC Rural Orchestration
+        </h2>
+        <p class="text-sm sm:text-base text-slate-600 max-w-xl mx-auto" data-i18n="signUpDesc">
+          Whether you are a grower, an FPO manager, a transport driver, a cold store operator, or a composting plant owner, register to connect your nodes.
+        </p>
+      </div>
+
+      <form id="onboardingForm" onsubmit="handleOnboardingSubmit(event)" class="mt-10 bg-white p-6 sm:p-10 rounded-3xl border border-slate-200 shadow-md space-y-6">
+        
+        <div class="grid sm:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2" data-i18n="formName">Full Name / Contact Person</label>
+            <input type="text" required placeholder="e.g. Ramesh Patil" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2" data-i18n="formPhone">Mobile / WhatsApp Number</label>
+            <input type="tel" required placeholder="e.g. +91 98220 12345" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2" data-i18n="formRole">I Represent</label>
+            <select required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-brand-500 focus:outline-none">
+              <option value="farmer" data-i18n="roleFarmer">Individual Farmer / Grower Cluster</option>
+              <option value="fpo" selected data-i18n="roleFpo">Farmer Producer Organization (FPO) / Cooperative</option>
+              <option value="compost" data-i18n="roleCompost">Composting / Bio-CNG / Waste Recovery Facility</option>
+              <option value="processor" data-i18n="roleProcessor">Food Processor / Agro Enterprise</option>
+              <option value="logistics" data-i18n="roleLogistics">Transporter / Fleet Operator</option>
+              <option value="storage" data-i18n="roleStorage">Cold Storage / Warehouse Facility</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2" data-i18n="formDistrict">Village / District / State</label>
+            <input type="text" required placeholder="e.g. Dindori, Nashik, Maharashtra" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2" data-i18n="formDetails">Commodities, Volume, or Infrastructure Details</label>
+          <textarea rows="3" placeholder="e.g. 500 members producing Tomato & Onion; or 100 MT vermicompost manufacturing unit..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"></textarea>
+        </div>
+
+        <button type="submit" class="w-full py-4 rounded-xl bg-brand-700 hover:bg-brand-800 text-white font-bold text-base shadow-md shadow-brand-700/20 transition flex items-center justify-center gap-2">
+          <i data-lucide="send" class="w-5 h-5"></i>
+          <span data-i18n="formSubmitBtn">Submit Registration</span>
+        </button>
+
+        <div id="formSuccessMessage" class="hidden p-4 rounded-2xl bg-emerald-100 text-emerald-900 text-sm font-semibold text-center border border-emerald-300">
+          <span data-i18n="formSuccessText">🎉 Registration received! A local Gramsync coordinator will connect with you via WhatsApp/Call within 24 hours.</span>
+        </div>
+
+      </form>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-slate-950 text-slate-400 py-10 border-t border-slate-800 text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pb-6 border-b border-slate-800">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center text-white font-bold">
+            <i data-lucide="sprout" class="w-5 h-5 text-emerald-300"></i>
+          </div>
+          <div>
+            <div class="text-lg font-bold font-display text-white">GRAM<span class="text-brand-500">SYNC</span></div>
+            <p class="text-[10px] text-slate-400" data-i18n="footerSub">Harvest Routing & Rural Production Network</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-6 font-semibold">
+          <a href="#simulator" class="hover:text-white transition" data-i18n="navSimulator">Simulator</a>
+          <a href="#map-section" class="hover:text-white transition" data-i18n="navMap">Route Map</a>
+          <a href="#compost-section" class="hover:text-white transition" data-i18n="navCompost">Composting</a>
+          <a href="#partner-form" class="hover:text-white transition" data-i18n="navSignUp">Sign Up</a>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3 text-slate-500 text-[11px]">
+        <div data-i18n="footerCopyright">
+          © 2026 GRAMSYNC Network. Operational platform for harvest dispatch, logistics consolidation & composting recovery.
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="flex items-center gap-1"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i> Farmer Sovereign Control</span>
+          <span class="flex items-center gap-1"><i data-lucide="recycle" class="w-3.5 h-3.5 text-lime-400"></i> Zero-Waste Loop</span>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- DISPATCH CONFIRMATION TOAST / MODAL -->
+  <div id="dispatchModal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 space-y-4 shadow-2xl border border-slate-200 text-center">
+      <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
+        <i data-lucide="check" class="w-8 h-8"></i>
+      </div>
+      <h3 class="text-xl font-bold font-display text-slate-900" data-i18n="dispatchModalTitle">Dispatch Route Confirmed!</h3>
+      <p id="dispatchModalMsg" class="text-xs text-slate-600 leading-relaxed">
+        Your dispatch order has been generated. The shared FPO vehicle and composting link have been notified.
+      </p>
+      <div class="p-3 bg-slate-50 rounded-xl text-left text-xs space-y-1 font-mono text-slate-700 border border-slate-200">
+        <div><strong>Batch ID:</strong> <span id="modalBatchId">GS-2026-NASHIK-491</span></div>
+        <div><strong>Pickup Point:</strong> Dindori Farm Cluster Gate #2</div>
+        <div><strong>Vehicle:</strong> Bolero Maxi #MH-15-EG-8192</div>
+      </div>
+      <button onclick="closeDispatchModal()" class="w-full py-3 rounded-xl bg-brand-700 hover:bg-brand-800 text-white font-bold text-xs uppercase tracking-wider transition">
+        Close & View Map
+      </button>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT APP -->
+  <script src="app.js"></script>
+</body>
+</html>
